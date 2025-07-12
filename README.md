@@ -12,16 +12,10 @@
 
 *MENTOR*: NEELA SANTHOSH
 
-## 💬 Realtime Chat Application
-
-This is a real-time chat application built . It uses **React (Vite)** for the frontend and **Node.js with Socket.IO** for the backend.
-
+##  Realtime Chat Application is  a real-time chat application built . It uses **React (Vite)** for the frontend and **Node.js with Socket.IO** for the backend.
 ## Having Features
 - Real-time messaging between users
 - Powered by **WebSockets (Socket.IO)**
-- Simple and responsive React UI
-- Vite development server for fast builds
-
 . Run the Backend
 cd backend
 npm install
