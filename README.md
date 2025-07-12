@@ -14,36 +14,21 @@
 
 ## 💬 Realtime Chat Application
 
-This is a real-time chat application built as part of the **CodTech Internship Task-1**. It uses **React (Vite)** for the frontend and **Node.js with Socket.IO** for the backend.
+This is a real-time chat application built . It uses **React (Vite)** for the frontend and **Node.js with Socket.IO** for the backend.
 
-## 🚀 Features
-
+## Having Features
 - Real-time messaging between users
 - Powered by **WebSockets (Socket.IO)**
 - Simple and responsive React UI
 - Vite development server for fast builds
 
-## 📁 Folder Structure
-
-realtimechatapplication/
-├── backend/ # Express + Socket.IO backend
-│ └── index.js
-├── frontend/ # React + Vite frontend
-│ ├── public/
-│ ├── src/
-│ │ ├── App.jsx
-│ │ └── main.jsx
-│ └── index.html
-├── README.md
-
-2. Run the Backend
+. Run the Backend
 cd backend
 npm install
 node index.js
 This will start your backend server on:
 🔗 http://localhost:3001
-
-3. Run the Frontend
+. Run the Frontend
 cd ../frontend
 npm install
 npm run dev
