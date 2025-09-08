@@ -1,11 +1,12 @@
 const express = require('express')
+const path = require('path')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 
-app.set('views', './views')
+app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
-app.use(express.static('public'))
+app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: true }))
 
 const rooms = { }
@@ -31,7 +32,10 @@ app.get('/:room', (req, res) => {
   res.render('room', { roomName: req.params.room })
 })
 
-server.listen(3000)
+const PORT = process.env.PORT || 3000
+server.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`)
+})
 
 io.on('connection', socket => {
   socket.on('new-user', (room, name) => {
