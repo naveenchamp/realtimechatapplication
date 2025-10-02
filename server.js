@@ -2,13 +2,21 @@ const express = require('express')
 const path = require('path')
 const app = express()
 const server = require('http').Server(app)
-const io = require('socket.io')(server)
+
+// --- FIX #1: Added CORS configuration for deployment ---
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "*", // Allows connections from any origin
+    methods: ["GET", "POST"]
+  }
+})
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: true }))
 
+// Reminder: This in-memory object will be cleared if the server restarts.
 const rooms = { }
 
 app.get('/', (req, res) => {
@@ -44,7 +52,8 @@ io.on('connection', socket => {
     socket.to(room).broadcast.emit('user-connected', name)
   })
   socket.on('send-chat-message', (room, message) => {
-    socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
+    // --- FIX #2: Changed to io.to().emit() so the sender also receives the message ---
+    io.to(room).emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
   })
   socket.on('disconnect', () => {
     getUserRooms(socket).forEach(room => {
