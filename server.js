@@ -20,9 +20,9 @@ app.post('/room', (req, res) => {
     return res.redirect('/')
   }
   rooms[req.body.room] = { users: {} }
-  res.redirect(req.body.room)
-  // Send message that new room was created
+  // FIX #1: Emitting the event BEFORE the redirect, so it actually runs.
   io.emit('room-created', req.body.room)
+  res.redirect(req.body.room)
 })
 
 app.get('/:room', (req, res) => {
@@ -34,26 +34,42 @@ app.get('/:room', (req, res) => {
 
 const PORT = process.env.PORT || 3000
 server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
 
 io.on('connection', socket => {
   socket.on('new-user', (room, name) => {
-    socket.join(room)
-    rooms[room].users[socket.id] = name
-    socket.to(room).broadcast.emit('user-connected', name)
+    // FIX #2: Added a check to prevent crashing if the room doesn't exist.
+    if (rooms[room]) {
+      socket.join(room)
+      rooms[room].users[socket.id] = name
+      socket.to(room).broadcast.emit('user-connected', name)
+    }
   })
   
-  // FIX IS HERE: Changed to io.to(room).emit
   socket.on('send-chat-message', (room, message) => {
-    // This sends to everyone EXCEPT you
-socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
+    // Added a check for robustness to ensure user and room exist.
+    if (rooms[room] && rooms[room].users[socket.id]) {
+      socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
+    }
   })
 
   socket.on('disconnect', () => {
     getUserRooms(socket).forEach(room => {
-      socket.to(room).broadcast.emit('user-disconnected', rooms[room].users[socket.id])
-      delete rooms[room].users[socket.id]
+      // Added a check to ensure user and room exist before processing.
+      if (rooms[room] && rooms[room].users[socket.id]) {
+        const userName = rooms[room].users[socket.id]
+        socket.to(room).broadcast.emit('user-disconnected', userName)
+        delete rooms[room].users[socket.id]
+
+        // Optional but good practice: Clean up empty rooms to save memory.
+        if (Object.keys(rooms[room].users).length === 0) {
+          delete rooms[room]
+          console.log(`Room '${room}' was empty and has been deleted.`)
+          // Notify all clients to remove the room from their list
+          io.emit('room-deleted', room)
+        }
+      }
     })
   })
 })
