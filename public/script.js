@@ -9,13 +9,20 @@ if (messageForm != null) {
   appendMessage('You joined')
   socket.emit('new-user', roomName, name)
 
-  messageForm.addEventListener('submit', e => {
-    e.preventDefault()
-    const message = messageInput.value
-    appendMessage(`You: ${message}`)
-    socket.emit('send-chat-message', roomName, message)
-    messageInput.value = ''
-  })
+messageForm.addEventListener('submit', e => {
+  e.preventDefault()
+  const message = messageInput.value
+
+  // ✅ Check if the message is empty FIRST.
+  if (message === '') {
+    return // Stop the function if there's no message.
+  }
+
+  // Now, only proceed if the message is not empty.
+  appendMessage(`You: ${message}`)
+  socket.emit('send-chat-message', roomName, message)
+  messageInput.value = ''
+})
 }
 
 socket.on('room-created', room => {
