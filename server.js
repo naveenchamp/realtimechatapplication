@@ -46,7 +46,8 @@ io.on('connection', socket => {
   
   // FIX IS HERE: Changed to io.to(room).emit
   socket.on('send-chat-message', (room, message) => {
-    io.to(room).emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
+    // This sends to everyone EXCEPT you
+socket.to(room).broadcast.emit('chat-message', { message: message, name: rooms[room].users[socket.id] })
   })
 
   socket.on('disconnect', () => {
